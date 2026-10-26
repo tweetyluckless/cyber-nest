@@ -1,0 +1,13 @@
+{
+  "name": "ai-pixel-farm",
+  "version": "0.1.0",
+  "description": "赛博小窝 - AI 们一起住的像素桌面放置小游戏",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^45.0.0"
+  }
+}

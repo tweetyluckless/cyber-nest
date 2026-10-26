@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>赛博小窝</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="scene">
+      <canvas id="room"></canvas>
+      <div id="fx"></div>
+      <div id="hud">
+        <div id="tokens">0</div>
+        <div class="sub"><span id="tps">每秒 0 Token</span><span id="buff"></span></div>
+        <div id="envInfo"></div>
+      </div>
+      <div id="toast"></div>
+      <div id="tip"></div>
+    </div>
+
+    <aside id="side">
+      <nav id="tabs">
+        <button data-tab="chars" class="on">角色</button>
+        <button data-tab="ups">升级<i id="upBadge"></i></button>
+        <button data-tab="partners">伙伴</button>
+        <button data-tab="shop">商城</button>
+        <button data-tab="env">环境</button>
+        <button data-tab="stats">统计</button>
+        <div id="bulk">
+          <button data-bulk="1" class="on">×1</button>
+          <button data-bulk="10">×10</button>
+          <button data-bulk="max">最大</button>
+        </div>
+      </nav>
+      <main id="panel">
+        <div id="tab-chars" class="tab on"></div>
+        <div id="tab-ups" class="tab"></div>
+        <div id="tab-partners" class="tab"></div>
+        <div id="tab-shop" class="tab"></div>
+        <div id="tab-env" class="tab"></div>
+        <div id="tab-stats" class="tab"></div>
+      </main>
+    </aside>
+
+    <div id="ctrl">
+      <button id="btnDecor" title="装修模式：拖动家具换位置">🛠</button>
+      <button id="btnPanel" title="收起菜单">▶</button>
+      <button id="btnPin" title="窗口置顶">▲</button>
+      <button id="btnMin" title="最小化">—</button>
+      <button id="btnClose" title="关闭">✕</button>
+    </div>
+  </div>
+
+  <script src="sprites.js"></script>
+  <script src="dialogue.js"></script>
+  <script src="items.js"></script>
+  <script src="game.js"></script>
+  <script src="music.js"></script>
+  <script src="scene.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>

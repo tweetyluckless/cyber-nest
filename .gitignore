@@ -1,0 +1,5 @@
+node_modules/
+.claude/
+*.log
+# 宣传片原文件（仓库里放的是 docs/promo.mp4）
+赛博小窝宣传片.mp4
