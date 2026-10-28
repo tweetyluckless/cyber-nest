@@ -38,6 +38,7 @@ function createWindow() {
     alwaysOnTop: prefs.stripPinned ?? false,
     backgroundColor: '#0b0820',
     title: '赛博小窝',
+    icon: path.join(__dirname, 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -65,5 +66,16 @@ ipcMain.handle('win:togglePin', () => {
   return pinned;
 });
 
-app.whenReady().then(createWindow);
+// 只开一个：已经开着时再双击快捷方式，就把原来那个窗口叫到前面（两个窗口会抢同一份存档）
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (!win || win.isDestroyed()) return;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+  });
+  app.whenReady().then(createWindow);
+}
 app.on('window-all-closed', () => app.quit());
