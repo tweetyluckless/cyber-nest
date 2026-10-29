@@ -27,6 +27,11 @@ function stripBounds() {
   return { x: a.x, y: a.y + a.height - height, width: a.width, height };
 }
 
+// 默认的 floating 级别在 Windows 上设了不生效（isAlwaysOnTop 读回来还是 false），换成 screen-saver 级别
+function setPinned(on) {
+  win.setAlwaysOnTop(on, 'screen-saver');
+}
+
 function createWindow() {
   const prefs = loadPrefs();
   win = new BrowserWindow({
@@ -35,7 +40,6 @@ function createWindow() {
     resizable: false,
     maximizable: false,
     fullscreenable: false,
-    alwaysOnTop: prefs.stripPinned ?? false,
     backgroundColor: '#0b0820',
     title: '赛博小窝',
     icon: path.join(__dirname, 'icon.ico'),
@@ -46,6 +50,7 @@ function createWindow() {
     },
   });
 
+  setPinned(prefs.stripPinned ?? false);
   win.setMenu(null);
   win.loadFile('index.html');
 
@@ -61,7 +66,7 @@ ipcMain.on('win:minimize', () => win?.minimize());
 ipcMain.handle('win:isPinned', () => win?.isAlwaysOnTop());
 ipcMain.handle('win:togglePin', () => {
   const pinned = !win.isAlwaysOnTop();
-  win.setAlwaysOnTop(pinned);
+  setPinned(pinned);
   savePrefs({ stripPinned: pinned });
   return pinned;
 });
