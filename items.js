@@ -87,6 +87,11 @@ const SHOP = {
     { id: 'violin', icon: '🎻', name: '小提琴', desc: '配一个乐谱架', price: 1800 },
     { id: 'synth', icon: '🎹', name: '电子琴', desc: '哔哔啵啵的合成器', price: 2000 },
     { id: 'drums', icon: '🥁', name: '架子鼓', desc: '合奏的节奏担当', price: 2500 },
+    { id: 'bass', icon: '🎸', name: '贝斯', desc: '配一个小音箱，低音一响乐队就稳了', price: 2200 },
+    { id: 'flute', icon: '🪈', name: '长笛', desc: '清清亮亮的，雨天波萨最爱它', price: 1600 },
+    { id: 'accordion', icon: '🪗', name: '手风琴', desc: '海边华尔兹就等它开口', price: 2400 },
+    { id: 'marimba', icon: '🎶', name: '木琴', desc: '叮叮咚咚，敲起来很治愈', price: 2800 },
+    { id: 'sax', icon: '🎷', name: '萨克斯', desc: '爵士小猫的灵魂', price: 3000 },
   ],
   // 增益：买了立刻生效
   boost: [

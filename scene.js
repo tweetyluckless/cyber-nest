@@ -2099,7 +2099,7 @@ const room = (() => {
   }
 
   // ---------- 合奏 ----------
-  const INSTR = ['piano', 'guitar', 'violin', 'drums', 'synth'];
+  const INSTR = ['piano', 'guitar', 'violin', 'drums', 'synth', 'bass', 'flute', 'sax', 'accordion', 'marimba'];
   let ensemble = false;               // 两个以上的人在演奏
   let lastBeat = -1, nextCheer = 0, nextJamBonus = 0;
   function updateBand(dt, now) {
@@ -2582,6 +2582,79 @@ const room = (() => {
       },
       spots: (x, y) => [{ kind: 'synth', ax: x, ay: y + 3, dx: x, dy: y - 6 }],
     },
+    bass: {
+      where: 'any', w: 16, h: 16, fw: 6, fd: 3,
+      draw(x, y) {
+        // 小音箱
+        r(x - 5, y - 11, 11, 11, '#2a2a34');
+        r(x - 5, y - 11, 11, 1, '#4a4a5a');
+        r(x - 3, y - 9, 7, 7, '#15151c');
+        r(x - 1, y - 7, 3, 3, '#3a3a4a');
+        r(x + 3, y - 11, 1, 1, '#ff5d5d');
+      },
+      anim(x, y, t, pf) {
+        if (spots.some((sp) => sp.furn === pf.uid && sp.who)) return;
+        drawGuitar(x + 7, y - 3, 1, 0, '#b03050', 3);
+      },
+      spots: (x, y) => [{ kind: 'bass', face: 1, ax: x - 10, ay: y + 1, dx: x - 9, dy: y + 1 }],
+    },
+    flute: {
+      where: 'any', w: 12, h: 18, fw: 4, fd: 3,
+      draw(x, y) {
+        r(x, y - 12, 1, 12, '#3a3a4a');
+        line(x, y - 1, x - 3, y, '#3a3a4a');
+        line(x, y - 1, x + 3, y, '#3a3a4a');
+        r(x - 5, y - 16, 11, 5, '#2a2a34');
+        r(x - 4, y - 15, 9, 3, '#e8f0ff');
+      },
+      anim(x, y, t, pf) {
+        if (spots.some((sp) => sp.furn === pf.uid && sp.who)) return;
+        line(x - 5, y - 8, x + 5, y - 11, '#d8dce8');
+      },
+      spots: (x, y) => [{ kind: 'flute', face: 1, ax: x - 9, ay: y + 1, dx: x - 8, dy: y + 1 }],
+    },
+    sax: {
+      where: 'any', w: 12, h: 18, fw: 4, fd: 3,
+      draw(x, y) {
+        line(x, y - 1, x - 4, y, '#3a3a4a');
+        line(x, y - 1, x + 4, y, '#3a3a4a');
+        r(x, y - 5, 1, 4, '#3a3a4a');
+      },
+      anim(x, y, t, pf) {
+        if (spots.some((sp) => sp.furn === pf.uid && sp.who)) return;
+        drawSax(x, y - 3, 1);
+      },
+      spots: (x, y) => [{ kind: 'sax', face: 1, ax: x - 9, ay: y + 1, dx: x - 8, dy: y + 1 }],
+    },
+    accordion: {
+      where: 'any', w: 14, h: 14, fw: 5, fd: 3,
+      draw(x, y) {
+        // 小木凳
+        r(x - 5, y - 6, 11, 2, '#8a5e3c');
+        r(x - 5, y - 6, 11, 1, '#a07450');
+        r(x - 4, y - 4, 1, 4, '#6b4a2f');
+        r(x + 4, y - 4, 1, 4, '#6b4a2f');
+      },
+      anim(x, y, t, pf) {
+        if (spots.some((sp) => sp.furn === pf.uid && sp.who)) return;
+        drawAccordion(x, y - 10, 5);
+      },
+      spots: (x, y) => [{ kind: 'accordion', face: 1, ax: x - 9, ay: y + 1, dx: x - 8, dy: y + 1 }],
+    },
+    marimba: {
+      where: 'any', w: 28, h: 13, fw: 13, fd: 3,
+      draw(x, y) {
+        for (const lx of [x - 11, x + 11]) r(lx, y - 8, 1, 8, '#6b4a2f');
+        r(x - 11, y - 3, 23, 1, '#6b4a2f');
+        const cols = ['#c8884a', '#b87838', '#c8884a', '#b87838'];
+        for (let k = 0; k < 13; k++) {
+          const h = 5 - Math.floor(k / 4);
+          r(x - 13 + k * 2, y - 12, 2, h, cols[k % 4]);
+          r(x - 13 + k * 2, y - 12, 2, 1, '#e8b878');
+        }
+      },
+      spots: (x, y) => [{ kind: 'marimba', ax: x, ay: y + 3, dx: x, dy: y - 6 }],
+    },
   });
 
   // 庭院里的新设施
@@ -2714,12 +2787,28 @@ const room = (() => {
   });
 
   // 拿在手上的吉他：琴身 + 斜着的琴颈（d 是琴颈朝向）
-  function drawGuitar(x, y, d, strum) {
-    for (const [dx, dy, w] of [[-3, -3, 7], [-4, -2, 9], [-4, -1, 9], [-3, 0, 7], [-3, 1, 7]]) r(x + dx, y + dy, w, 1, '#d08a3a');
+  function drawGuitar(x, y, d, strum, body = '#d08a3a', neck = 0) {
+    for (const [dx, dy, w] of [[-3, -3, 7], [-4, -2, 9], [-4, -1, 9], [-3, 0, 7], [-3, 1, 7]]) r(x + dx, y + dy, w, 1, body);
     r(x - 1, y - 2, 3, 2, '#5a3020');
-    line(x + d * 3, y - 2, x + d * 9, y - 6, '#6b4a2f');
-    r(x + d * 9 - (d < 0 ? 1 : 0), y - 7, 2, 2, '#3a2a20');
+    line(x + d * 3, y - 2, x + d * (9 + neck), y - 6 - neck, '#6b4a2f');
+    r(x + d * (9 + neck) - (d < 0 ? 1 : 0), y - 7 - neck, 2, 2, '#3a2a20');
     if (strum) r(x - d * 2, y - 1 - strum, 1, 1, '#ffffff');
+  }
+  // 萨克斯：金色弯管，喇叭口朝上
+  function drawSax(x, y, d) {
+    line(x, y - 9, x, y - 2, '#e8c060');
+    line(x, y - 1, x + d * 3, y - 1, '#e8c060');
+    line(x + d * 3, y - 1, x + d * 4, y - 5, '#e8c060');
+    r(x + d * 4 - (d < 0 ? 1 : 0), y - 6, 2, 1, '#fff0a8');
+    r(x + (d < 0 ? 0 : -1), y - 10, 2, 1, '#3a2a20');
+    r(x, y - 6, 1, 1, '#a07c30');
+    r(x, y - 4, 1, 1, '#a07c30');
+  }
+  // 手风琴：w 是一半宽度，拉开合上时会变
+  function drawAccordion(x, y, w) {
+    r(x - w - 1, y - 2, 2, 5, '#f4efe4');
+    r(x + w, y - 2, 2, 5, '#f4efe4');
+    for (let k = -w + 1; k < w; k++) r(x + k, y - 2, 1, 5, k % 2 ? '#c23b55' : '#7a2236');
   }
   // 演奏中的角色手上的乐器
   function drawHeldInstrument(e, foot, h, t) {
@@ -2734,6 +2823,19 @@ const room = (() => {
       line(vx + d * 2, vy - 1, vx + d * 6, vy - 3, '#3a2218');
       const bx = Math.round(Math.sin(t * 6 + e.phase) * 3);
       line(vx - d * 4 + bx, vy - 4, vx + d * 3 + bx, vy + 2, '#e8dcc0');
+    }
+    if (e.act.kind === 'bass') drawGuitar(Math.round(e.x + d * 2), Math.round(foot - h * 0.3), d, hit, '#b03050', 3);
+    if (e.act.kind === 'flute') {
+      const fy = Math.round(foot - h * 0.6), fx = Math.round(e.x + d * 3);
+      line(fx, fy, fx + d * 11, fy + 1, '#d8dce8');
+      r(fx + d * 5, fy, 1, 1, '#8a8a96');
+      r(fx + d * 8, fy + 1, 1, 1, '#8a8a96');
+    }
+    if (e.act.kind === 'sax') drawSax(Math.round(e.x + d * 5), Math.round(foot - h * 0.2), d);
+    if (e.act.kind === 'accordion') drawAccordion(Math.round(e.x + d * 6), Math.round(foot - h * 0.3), 3 + Math.round(Math.sin(t * 5 + e.phase)));
+    if (e.act.kind === 'marimba' && hit) {
+      r(Math.round(e.x - 5), Math.round(foot + 1), 1, 2, '#e8dcc0');
+      r(Math.round(e.x + 5), Math.round(foot - 1), 1, 2, '#e8dcc0');
     }
     if (e.act.kind === 'drums' && hit) {
       r(Math.round(e.x - 6), Math.round(foot + 1), 1, 2, '#e8dcc0');
@@ -3190,6 +3292,11 @@ const room = (() => {
     violin: { min: 15, max: 30, stat: 'pianos', aff: 2 },
     drums: { min: 15, max: 30, stat: 'pianos', aff: 2 },
     synth: { min: 15, max: 30, stat: 'pianos', aff: 2 },
+    bass: { min: 15, max: 30, stat: 'pianos', aff: 2 },
+    flute: { min: 15, max: 30, stat: 'pianos', aff: 2 },
+    sax: { min: 15, max: 30, stat: 'pianos', aff: 2 },
+    accordion: { min: 15, max: 30, stat: 'pianos', aff: 2 },
+    marimba: { min: 15, max: 30, stat: 'pianos', aff: 2 },
     stargaze: { min: 12, max: 25, aff: 2 },
     nap: { min: 20, max: 40, stat: 'sleeps', aff: 2 },
   };
@@ -4431,7 +4538,7 @@ const room = (() => {
       const jump = e.jump > 0 ? Math.round(Math.sin((e.jump / 0.4) * Math.PI) * 6) : 0;
       const lift = Math.round((e.lift || 0) + (e.hopLift || 0));
       // 坐着、吃饭、泡澡、荡秋千都不在地上，不画影子；蹦床的影子留在垫子上
-      if (!['sit', 'eat', 'bath', 'swing', 'perch', 'piano', 'nap', 'guitar', 'drums', 'synth', 'picnic', 'sand'].includes(kind)) {
+      if (!['sit', 'eat', 'bath', 'swing', 'perch', 'piano', 'nap', 'guitar', 'drums', 'synth', 'marimba', 'picnic', 'sand'].includes(kind)) {
         const shadowW = Math.max(6, spr.width - 4 - Math.floor(lift / 6));
         g.fillStyle = 'rgba(0,0,0,0.3)';
         g.fillRect(Math.round(e.x - shadowW / 2), Math.round(e.y) - 1, shadowW, 2);
@@ -4511,6 +4618,7 @@ const room = (() => {
     arcade: '在玩街机 🕹', stargaze: '在看星星 🔭', nap: '在打盹',
     slide: '在玩滑梯', sand: '在沙坑里堆城堡', picnic: '在野餐 🧺', wish: '在喷泉边许愿',
     guitar: '在弹吉他 🎸', violin: '在拉小提琴 🎻', drums: '在打鼓 🥁', synth: '在弹电子琴 🎹',
+    bass: '在弹贝斯 🎸', flute: '在吹长笛', sax: '在吹萨克斯 🎷', accordion: '在拉手风琴 🪗', marimba: '在敲木琴',
   };
   const GOING = {
     sit: '去找地方坐', type: '去书桌写代码', sleep: '去床上睡觉', eat: '去餐桌吃饭', bath: '去泡温泉', swing: '去荡秋千', bounce: '去玩蹦床',
@@ -4518,6 +4626,7 @@ const room = (() => {
     arcade: '去玩街机', stargaze: '去看星星', nap: '去打个盹',
     slide: '去玩滑梯', sand: '去沙坑', picnic: '去野餐', wish: '去喷泉许愿',
     guitar: '去弹吉他', violin: '去拉小提琴', drums: '去打鼓', synth: '去弹电子琴',
+    bass: '去弹贝斯', flute: '去吹长笛', sax: '去吹萨克斯', accordion: '去拉手风琴', marimba: '去敲木琴',
   };
   // 伙伴页显示的当前状态（有好几只时看第一只）
   function statusOf(type, slot = 0) {
@@ -4659,7 +4768,7 @@ const room = (() => {
   const DROP_KIND = {
     type: 'desk', sleep: 'bed', sit: 'seat', eat: 'eat', bath: 'bath', swing: 'swing', bounce: 'bounce', garden: 'garden', fish: 'fish', camp: 'camp',
     piano: 'piano', game: 'game', aquarium: 'aquarium', perch: 'perch',
-    arcade: 'arcade', stargaze: 'stargaze', nap: 'nap', slide: 'slide', sand: 'sand', picnic: 'picnic', wish: 'wish', guitar: 'guitar', violin: 'violin', drums: 'drums', synth: 'synth',
+    arcade: 'arcade', stargaze: 'stargaze', nap: 'nap', slide: 'slide', sand: 'sand', picnic: 'picnic', wish: 'wish', guitar: 'guitar', violin: 'violin', drums: 'drums', synth: 'synth', bass: 'bass', flute: 'flute', sax: 'sax', accordion: 'accordion', marimba: 'marimba',
   };
   function spotHit(sp, p) {
     switch (sp.kind) {
